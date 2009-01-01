@@ -1,0 +1,57 @@
+Video RAM filesystem README.
+(C) 2008 Jonathan Campbell.
+
+vramfs is a pseudo-filesystem that allows you to store files and data in the onboard video RAM of your VGA card.
+This can be useful, for example, if your VGA hardware has lots of extra RAM on it that you don't use.
+It can also be used as a simple and effective filesystem for sharing VRAM resources across multiple processes,
+in a way that doesn't conflict or need complicated drivers to manage.
+
+Mounting the filesystem:
+
+You cannot just mount the filesystem, you must specify as mount options what VRAM resources you want this filesystem to use.
+
+Mount a resource directly:
+physical=xxxxxxxx        Physical memory address of the resource
+length=xxxxxxx           Length of the physical memory resource
+
+Mount a PCI device resource:
+pci=d:b:s:f              VGA-class PCI device with VRAM resource to use (domain:bus:slot:function)
+
+Allow or disallow mmap() on this filesystem:
+mmap=1                   Allow mmap on the filesystem
+mmap=0                   Don't allow mmap
+
+Automatically section off framebuffer:
+framebuffer=nn           Section off nn bytes of active VRAM in use by linux framebuffer console
+
+When framebuffer is used, the first framebuffer bytes of the VRAM are automatically assigned to a
+root-owned file named "framebuffer". As long as that file is present, files around it will not
+occupy the portion of VRAM that specified to be in use by the Linux framebuffer console.
+
+If the fake_vram module option is used on loading the module, then failing to specify either physical
+or pci device parameters causes the module to use a contigious region of physical memory (__get_free_pages)
+as emulated VRAM (for debugging purposes).
+
+
+Files stored in VRAM are not cleared on unmount, though the allocation structures are discarded.
+
+
+
+Files stored in this filesystem function almost like files on any other filesystem, but with the limit
+that they cannot be sparse or fragmented. Files are always continuous in VRAM. This does mean that
+if fragmentation can prevent a file from expanding, even if total space might otherwise allow it.
+
+
+IOCTLs:
+
+An ioctl is provided to allow any process to know at what block their file starts in VRAM. This can be used
+by 2D or 3D hardware acceleration managment code to quickly locate the file and instruct that the GPU do
+something with it.
+
+Reservation mechanism:
+
+A root-level process may request that blocks be reserved. This allows the root level process to ensure that
+if the process owning it releases it, that it cannot get it back, and that further processes cannot claim it.
+This can be used to keep files off the active framebuffer, or by root to keep blocks open to prevent
+total fragmentation.
+
