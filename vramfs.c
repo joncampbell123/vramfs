@@ -354,7 +354,7 @@ static int vramfs_create(struct inode *i,struct dentry *d,int mode,struct nameid
 	vramfs_sb_unlock(SB_P(i->i_sb),spl);
 	DBG_("create in %u, '%s' mode %o",
 	    (unsigned int)i->i_ino,d->d_name.name,mode);
-	if (IS_ERR(inode)) return (int)inode;
+	if (IS_ERR(inode)) return (size_t)inode;
 	d_instantiate(d,inode);
 	return 0;
 }
@@ -365,7 +365,7 @@ static int vramfs_mkdir(struct inode *i,struct dentry *d,int mode) {
 	vramfs_sb_unlock(SB_P(i->i_sb),spl);
 	DBG_("mkdir in %u, '%s' mode %o",
 	    (unsigned int)i->i_ino,d->d_name.name,mode);
-	if (IS_ERR(inode)) return (int)inode;
+	if (IS_ERR(inode)) return (size_t)inode;
 	d_instantiate(d,inode);
 	return 0;
 }
@@ -386,7 +386,7 @@ static int vramfs_symlink(struct inode *i,struct dentry *d,const char *where) {
 	vramfs_sb_unlock(SB_P(i->i_sb),spl);
 	DBG_("symlink in %u, '%s' -> '%s'",
 	    (unsigned int)i->i_ino,d->d_name.name,where);
-	if (IS_ERR(inode)) return (int)inode;
+	if (IS_ERR(inode)) return (size_t)inode;
 	d_instantiate(d,inode);
 	return 0;
 }
@@ -1337,7 +1337,7 @@ static int fill_super(struct super_block *sb, void *data, int flags) {
 	root = vramfs_iget(sb, INODE_ROOT);
 	if (IS_ERR(root)) {
 		kfree(sbp);
-		return (int)root;
+		return (size_t)root;
 	}
 
 	DBG_("root inode: %u",(unsigned int)root->i_ino);
