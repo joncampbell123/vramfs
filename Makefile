@@ -1,6 +1,8 @@
 obj-m += vramfs.o
 
+ifndef $(KDIR)
 KDIR=/usr/src/2.6.27.9
+endif
 
 all:
 	make -C $(KDIR) M=$(PWD) modules
