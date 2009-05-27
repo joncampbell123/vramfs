@@ -1,0 +1,7 @@
+
+TODO:
+  Add code to detect and avoid Intel graphics chipsets---they don't
+  really have their own VRAM they steal from host memory (usually,
+  8MB) and the rest of the PCI resource is just the AGP aperature.
+  Worthless. Don't bother.
+
